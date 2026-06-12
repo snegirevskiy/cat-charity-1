@@ -1,19 +1,15 @@
 from datetime import datetime
 
-from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.crud.charity_project import get_open_projects
+from app.crud.donation import get_open_donations
 from app.models.charity_project import CharityProject
 from app.models.donation import Donation
 
 
 async def invest_donation(db: AsyncSession, donation: Donation):
-    projects = await db.execute(
-        select(CharityProject)
-        .where(CharityProject.fully_invested == False)  # noqa: E712
-        .order_by(CharityProject.create_date)
-    )
-    projects = projects.scalars().all()
+    projects = await get_open_projects(db)
 
     remaining_amount = donation.full_amount
 
@@ -38,12 +34,7 @@ async def invest_donation(db: AsyncSession, donation: Donation):
 
 
 async def invest_project(db: AsyncSession, project: CharityProject):
-    donations = await db.execute(
-        select(Donation)
-        .where(Donation.fully_invested == False)  # noqa: E712
-        .order_by(Donation.create_date)
-    )
-    donations = donations.scalars().all()
+    donations = await get_open_donations(db)
 
     remaining_amount = project.full_amount
 

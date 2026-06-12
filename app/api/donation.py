@@ -1,11 +1,8 @@
-from typing import List
-
 from fastapi import APIRouter, Depends
-from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.db import get_async_session
-from app.models.donation import Donation
+from app.crud.donation import create, get_all
 from app.schemas.schemas import (
     DonationCreate,
     DonationDB,
@@ -16,35 +13,22 @@ from app.services.investment import invest_donation
 router = APIRouter()
 
 
-@router.get(
-    '/',
-    response_model=List[DonationFullInfoDB],
-)
+@router.get('/', response_model=list[DonationFullInfoDB])
 async def get_all_donations(
-        db: AsyncSession = Depends(get_async_session),
+    db: AsyncSession = Depends(get_async_session),
 ):
-    result = await db.execute(select(Donation))
-    donations = result.scalars().all()
-    return donations
+    return await get_all(db)
 
 
-@router.post(
-    '/',
-    response_model=DonationDB,
-)
+@router.post('/', response_model=DonationDB)
 async def create_donation(
-        donation: DonationCreate,
-        db: AsyncSession = Depends(get_async_session),
+    donation: DonationCreate,
+    db: AsyncSession = Depends(get_async_session),
 ):
-    new_donation = Donation(
-        full_amount=donation.full_amount,
-        comment=donation.comment,
+    new_donation = await create(
+        db, donation.full_amount, donation.comment
     )
-    db.add(new_donation)
-    await db.flush()
-
     await invest_donation(db, new_donation)
-
     await db.commit()
     await db.refresh(new_donation)
     return new_donation

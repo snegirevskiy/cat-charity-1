@@ -3,21 +3,26 @@ from typing import Optional
 
 from pydantic import BaseModel, ConfigDict, Field
 
+MIN_NAME_LENGTH = 5
+MAX_NAME_LENGTH = 100
+MIN_DESCRIPTION_LENGTH = 10
+MIN_AMOUNT = 0
+
 
 class CharityProjectCreate(BaseModel):
     model_config = ConfigDict(extra='forbid')
 
-    name: str = Field(..., min_length=5, max_length=100)
-    description: str = Field(..., min_length=10)
-    full_amount: int = Field(..., gt=0)
+    name: str = Field(..., min_length=MIN_NAME_LENGTH, max_length=MAX_NAME_LENGTH)
+    description: str = Field(..., min_length=MIN_DESCRIPTION_LENGTH)
+    full_amount: int = Field(..., gt=MIN_AMOUNT)
 
 
 class CharityProjectUpdate(BaseModel):
     model_config = ConfigDict(extra='forbid')
 
-    name: Optional[str] = Field(None, min_length=5, max_length=100)
-    description: Optional[str] = Field(None, min_length=10)
-    full_amount: Optional[int] = Field(None, gt=0)
+    name: Optional[str] = Field(None, min_length=MIN_NAME_LENGTH, max_length=MAX_NAME_LENGTH)
+    description: Optional[str] = Field(None, min_length=MIN_DESCRIPTION_LENGTH)
+    full_amount: Optional[int] = Field(None, gt=MIN_AMOUNT)
 
 
 class CharityProjectDB(BaseModel):
@@ -36,7 +41,7 @@ class CharityProjectDB(BaseModel):
 class DonationCreate(BaseModel):
     model_config = ConfigDict(extra='forbid')
 
-    full_amount: int = Field(..., gt=0)
+    full_amount: int = Field(..., gt=MIN_AMOUNT)
     comment: Optional[str] = None
 
 
