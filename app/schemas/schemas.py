@@ -11,8 +11,9 @@ MIN_AMOUNT = 0
 
 class CharityProjectCreate(BaseModel):
     model_config = ConfigDict(extra='forbid')
-
-    name: str = Field(..., min_length=MIN_NAME_LENGTH, max_length=MAX_NAME_LENGTH)
+    name: str = Field(
+        ..., min_length=MIN_NAME_LENGTH, max_length=MAX_NAME_LENGTH
+    )
     description: str = Field(..., min_length=MIN_DESCRIPTION_LENGTH)
     full_amount: int = Field(..., gt=MIN_AMOUNT)
 
@@ -20,7 +21,9 @@ class CharityProjectCreate(BaseModel):
 class CharityProjectUpdate(BaseModel):
     model_config = ConfigDict(extra='forbid')
 
-    name: Optional[str] = Field(None, min_length=MIN_NAME_LENGTH, max_length=MAX_NAME_LENGTH)
+    name: Optional[str] = Field(
+        None, min_length=MIN_NAME_LENGTH, max_length=MAX_NAME_LENGTH
+    )
     description: Optional[str] = Field(None, min_length=MIN_DESCRIPTION_LENGTH)
     full_amount: Optional[int] = Field(None, gt=MIN_AMOUNT)
 
