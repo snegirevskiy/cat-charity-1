@@ -57,10 +57,7 @@ async def update_charity_project(
         await check_full_amount_gte_invested(update_data.full_amount, project)
 
     update_dict = update_data.model_dump(exclude_unset=True)
-    project = await update(db, project, update_dict)
-    await db.commit()
-    await db.refresh(project)
-    return project
+    return await update(db, project, update_dict)
 
 
 @router.delete('/{project_id}', response_model=CharityProjectDB)
@@ -70,6 +67,4 @@ async def delete_charity_project(
 ):
     project = await check_project_exists(project_id, db)
     await check_project_invested(project)
-    project = await remove(db, project)
-    await db.commit()
-    return project
+    return await remove(db, project)

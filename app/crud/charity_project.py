@@ -12,10 +12,10 @@ async def get_all(db: AsyncSession):
 
 
 async def create(
-    db: AsyncSession,
-    name: str,
-    description: str,
-    full_amount: int
+        db: AsyncSession,
+        name: str,
+        description: str,
+        full_amount: int
 ):
     project = CharityProject(
         name=name,
@@ -27,11 +27,7 @@ async def create(
     return project
 
 
-async def update(
-    db: AsyncSession,
-    project: CharityProject,
-    update_data: dict
-):
+async def update(db: AsyncSession, project: CharityProject, update_data: dict):
     for field, value in update_data.items():
         setattr(project, field, value)
 
@@ -39,20 +35,21 @@ async def update(
         project.fully_invested = True
         project.close_date = datetime.utcnow()
 
-    await db.flush()
+    await db.commit()
+    await db.refresh(project)
     return project
 
 
 async def remove(db: AsyncSession, project: CharityProject):
     await db.delete(project)
-    await db.flush()
+    await db.commit()
     return project
 
 
 async def get_open_projects(db: AsyncSession):
     result = await db.execute(
         select(CharityProject)
-        .where(CharityProject.fully_invested == False)  # noqa: E712
+        .where(CharityProject.fully_invested.is_(False))
         .order_by(CharityProject.create_date)
     )
     return result.scalars().all()

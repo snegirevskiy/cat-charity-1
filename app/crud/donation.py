@@ -10,9 +10,9 @@ async def get_all(db: AsyncSession):
 
 
 async def create(
-    db: AsyncSession,
-    full_amount: int,
-    comment: str | None = None
+        db: AsyncSession,
+        full_amount: int,
+        comment: str | None = None
 ):
     donation = Donation(
         full_amount=full_amount,
@@ -26,7 +26,7 @@ async def create(
 async def get_open_donations(db: AsyncSession):
     result = await db.execute(
         select(Donation)
-        .where(Donation.fully_invested == False)  # noqa: E712
+        .where(Donation.fully_invested.is_(False))
         .order_by(Donation.create_date)
     )
     return result.scalars().all()
